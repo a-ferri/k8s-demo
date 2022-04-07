@@ -11,7 +11,7 @@ git clone git@github.com:a-ferri/k8s-demo.git
 #### Create these environment variables:
 ```
 export IP="MY_IP"
-export ING_ADDR="${IP}.xip.io"
+export ING_ADDR="${IP}.nip.io"
 ```
 
 #### Kind
