@@ -134,7 +134,7 @@ kubectl apply -f ${HOME}/app/sample-statefulset.yaml
 ```
 > Side note: 
 > A StatefulSet have pretty much the same container spec of a Deployment. 
-> While Deployments are a good fit for *stateless" applications, as the name suggests, StatefulSets are great for Stateful applications.
+> While Deployments are a good fit for *stateless* applications, as the name suggests, StatefulSets are great for Stateful applications.
 > We could say that the main difference is that StatefulSets maintains a stick identifies for each one of their pods.
 
 #### PDB
