@@ -22,10 +22,23 @@ spec:
             cpu: 150m
           requests:
             cpu: 50m
+        startupProbe:
+          tcpSocket:
+            port: 5000
+          failureThreshold: 3
+          periodSeconds: 8
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /
             port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
@@ -35,6 +48,8 @@ metadata:
     app: sample-deploy
 spec:
   ports:
-  - port: 5000
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
   selector:
     app: sample-deploy

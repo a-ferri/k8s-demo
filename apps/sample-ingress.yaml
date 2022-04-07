@@ -5,10 +5,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - 192.168.1.35.nip.io
+        - {{nip}}
       secretName: ingress-tls
   rules:
-  - host: 192.168.1.35.nip.io
+  - host: {{nip}}
     http:
       paths:
       - path: /
@@ -16,5 +16,5 @@ spec:
           service:
             name: sample-deploy
             port:
-              number: 5000
+              number: 80
         pathType: ImplementationSpecific

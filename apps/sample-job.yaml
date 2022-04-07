@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sample-loadtest
+spec:
+  template:
+    spec:
+      containers:
+      - name: siege
+        image: afteixeira/siege:v1
+        command: ["siege",  "--concurrent=5", "--benchmark", "--time=5m", "http://sample-deploy"]
+      restartPolicy: Never
+  backoffLimit: 4
