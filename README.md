@@ -100,14 +100,14 @@ The first one is a simple python app installed as a Deployment (AKA ReplicaSet).
 
 This app calculates the square root of a random number between 100-10000
 ```
-kubectl apply -f ${HOME}/app/sample-deploy.yaml
+kubectl apply -f ${HOME}/k8s-demo/app/sample-deploy.yaml
 ```
 
 #### Ingress
 
 We also can install a ingress for our app so we can test it:
 ```
-sed "s/{{nip}}/$ING_ADDR/g" ${HOME}/app/sample-ingress.yaml |kubectl apply -f -
+sed "s/{{nip}}/$ING_ADDR/g" ${HOME}/k8s-demo/app/sample-ingress.yaml |kubectl apply -f -
 ```
 
 You should now be able to make requests:
@@ -124,7 +124,7 @@ curl -i https://$ING_ADDR -k
 
 Now that our sample app is up & running, let's add some traffic to it:
 ```
-kubectl apply -f ${HOME}/app/sample-job.yaml
+kubectl apply -f ${HOME}/k8s-demo/app/sample-job.yaml
 ```
 The `siege` app is a HTTP loading test tool and it's configured to start 5 concurrent threads during 5 minutes.
 
@@ -138,7 +138,7 @@ watch kubectl top pod -l app=sample-deploy
 
 While our app is being "attacked" by `siege`, let's configure the Horizontal Pod Autoscaling:
 ```
-kubectl apply -f ${HOME}/app/sample-hpa.yaml
+kubectl apply -f ${HOME}/k8s-demo/app/sample-hpa.yaml
 ```
 Wait a few seconds and our app should scale to 4 pods.
 
@@ -151,7 +151,7 @@ stern -l app=sample-deploy
 
 We're going to deploy a StatefulSet nginx to demonstrate how the Pod Disruption Budget can affect our cluster behavior.
 ```
-kubectl apply -f ${HOME}/app/sample-statefulset.yaml
+kubectl apply -f ${HOME}/k8s-demo/app/sample-statefulset.yaml
 ```
 > Side note: 
 > A StatefulSet have pretty much the same container spec of a Deployment. 
@@ -197,7 +197,7 @@ kubectl get pod -l app=sample-app -o wide
 
 Now we can apply the PDB manifest:
 ```
-kubectl apply -f ${HOME}/app/sample-pdb.yaml
+kubectl apply -f ${HOME}/k8s-demo/app/sample-pdb.yaml
 ```
 
 Our PDB is configured to allow only ONE unavailable pod in our StatefulSet sample-app.
