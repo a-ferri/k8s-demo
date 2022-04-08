@@ -26,11 +26,23 @@ export ING_ADDR="${IP}.nip.io"
 
 #### Install kind cluster
 
+Kind Clusters are a very easy way to deploy a K8s cluster.
+
+Instead of provisioning multiple VMs to act as nodes, kind clusters uses their nodes as containers.
+
 ```
 kind create cluster --config=${HOME}/k8s-demo/kind/config.yaml
 ```
 
-#### Install Calido CNI
+There are some customizations for our cluster - you can find them at `~/k8s-demo/kind/config.yaml`
+
+#### Install CNI Plugin
+
+We have disabled the default CNI plugin in our cluster.
+
+The nodes will remain unavailable until we deploy a CNI Plugin.
+
+Calico is known to work well with Kind Clusters, so that is our choice.
 
 ```
 kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
