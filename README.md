@@ -33,7 +33,7 @@ After your cluster is running, this command should show you the allocatable reso
 kubectl get node <NODE_NAME> -o=jsonpath='CPU:{"\t"}{.status.allocatable.cpu}{"\n"}MEM:{"\t"}{.status.allocatable.memory}{"\n"}'
 ```
 
-This information is important for the PDB tests as we have to assign enough resources to each pod of our StatefulSet so they cannot be schedule at the same node.
+This information is important for the PDB tests as we have to assign enough resources to each pod of our StatefulSet so they cannot be scheduled at the same node.
 
 ## Creating & configuring the cluster
 
