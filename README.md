@@ -112,13 +112,10 @@ sed "s/{{nip}}/$ING_ADDR/g" ${HOME}/k8s-demo/apps/sample-ingress.yaml |kubectl a
 
 You should now be able to make requests:
 ```
-curl -i $ING_ADDR
+curl -Li $ING_ADDR -k
 ```
 
 Although we are using a TLS certificate, it's not a trusted one, but you still can test it by using the `-k` curl flag:
-```
-curl -i https://$ING_ADDR -k
-```
 
 #### Load Test
 
