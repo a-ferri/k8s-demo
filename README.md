@@ -2,6 +2,14 @@
 
 ## Before you begin:
 
+#### Requirements
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [kustomize](https://kustomize.io/)
+
+#### Nice to have
+- [stern](https://github.com/wercker/stern/releases)
+
 #### Checkout this repo to your home folder:
 ```
 cd ~
@@ -13,12 +21,6 @@ git clone git@github.com:a-ferri/k8s-demo.git
 export IP="MY_IP"
 export ING_ADDR="${IP}.nip.io"
 ```
-
-#### Kind
-Please refer to [this](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) link for installing `kind`
-
-#### Useful stuff
-- [stern](https://github.com/wercker/stern/releases)
 
 ## Creating & configuring the cluster
 
@@ -34,19 +36,13 @@ kind create cluster --config=${HOME}/k8s-demo/kind/config.yaml
 kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
 ```
 
-#### Install CSR Approver
-```
-helm repo add kubelet-csr-approver https://postfinance.github.io/kubelet-csr-approver
-helm install kubelet-csr-approver kubelet-csr-approver/kubelet-csr-approver -n kube-system \
-  --set maxExpirationSeconds='86400' \
-  --set bypassDnsResolution='false'
-```
-
-> Note: Never ever use it on production! :)
-
 #### Install metrics-server
+
+Kind cluster do not assign certificates to nodes.
+
+Metrics Server uses nodes' FQDN to connect, so it will fail. Due to that, we have to patch the metrics-server manifest to allow `insecure-tls-connections`.
 ```
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kustomize build ${HOME}/k8s-demo/metrics-server/ |k apply -f -
 ```
 
 #### Install ingress controller
@@ -105,7 +101,7 @@ Now that our sample app is up & running, let's add some traffic to it:
 ```
 kubectl apply -f ${HOME}/app/sample-job.yaml
 ```
-The `siege` app is a HTTP loading test tool and it's configured to start concurrent 5 threads during 5 minutes.
+The `siege` app is a HTTP loading test tool and it's configured to start 5 concurrent threads during 5 minutes.
 
 You can monitor the resource consumption with:
 ```
