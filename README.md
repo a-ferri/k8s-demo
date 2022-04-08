@@ -22,6 +22,19 @@ export IP="MY_IP"
 export ING_ADDR="${IP}.nip.io"
 ```
 
+## Environment
+For this demo I'm using a laptop with 8 cores and 16Gb of memory.
+
+As our K8s nodes are running on containers, each node will consider the whole amount of resources available on the host!
+
+After your cluster is running, this command should show you the allocatable resources for your nodes:
+
+```
+kubectl get node <NODE_NAME> -o=jsonpath='CPU:{"\t"}{.status.allocatable.cpu}{"\n"}MEM:{"\t"}{.status.allocatable.memory}{"\n"}'
+```
+
+This information is important for the PDB tests as we have to assign enough resources to each pod of our StatefulSet so they cannot be schedule at the same node.
+
 ## Creating & configuring the cluster
 
 #### Install kind cluster
@@ -54,7 +67,7 @@ Kind cluster do not assign certificates to nodes.
 
 Metrics Server uses nodes' FQDN to connect, so it will fail. Due to that, we have to patch the metrics-server manifest to allow `insecure-tls-connections`.
 ```
-kustomize build ${HOME}/k8s-demo/metrics-server/ |k apply -f -
+kustomize build ${HOME}/k8s-demo/metrics-server/ |kubectl apply -f -
 ```
 
 #### Install ingress controller
@@ -145,9 +158,63 @@ kubectl apply -f ${HOME}/app/sample-statefulset.yaml
 > While Deployments are a good fit for *stateless* applications, as the name suggests, StatefulSets are great for *Stateful* applications.
 > We could say that the main difference is that StatefulSets maintains a stick identity for each one of their pods.
 
+#### Draining nodes
+
+Let's start draining one node:
+```
+kubectl drain demo-cluster-worker --ignore-daemonsets
+```
+
+This should work, even if the evicted pod cannot be scheduled on another node.
+
+Now let's see if we can drain another node:
+
+```
+kubectl drain demo-cluster-worker2 --ignore-daemonsets
+```
+
+It should also work!
+
+Check the nodes:
+```
+kubectl get node -o wide
+```
+
+> The `--ignore-daemonsets` is needed if we have any DaemonSet running at the node we're trying to drain!
+
 #### PDB
 
-To be continued...
+Before creating the PDB, lets put our drained nodes back to work:
+```
+kubectl uncordon demo-cluster-worker
+kubectl uncordon demo-cluster-worker2
+```
+
+Check if all pods are running:
+```
+kubectl get pod -l app=sample-app -o wide
+```
+
+Now we can apply the PDB manifest:
 ```
 kubectl apply -f ${HOME}/app/sample-pdb.yaml
 ```
+
+Our PDB is configured to allow only ONE unavailable pod in our StatefulSet sample-app.
+
+Let's start draining one node:
+```
+kubectl drain demo-cluster-worker --ignore-daemonsets
+```
+
+It works, as we only have one pod unavailable.
+
+Now let's try draining another node:
+
+```
+kubectl drain demo-cluster-worker2 --ignore-daemonsets
+```
+
+If we did things right, it should fail!
+
+As we already have an unavailable pod, PDB won't let we evict another one if K8s is unable to schedule a new pod.
